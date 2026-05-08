@@ -45,7 +45,7 @@
             filtrosToolStripMenuItem = new ToolStripMenuItem();
             pasoBajasToolStripMenuItem = new ToolStripMenuItem();
             gaussToolStripMenuItem = new ToolStripMenuItem();
-            kmeansToolStripMenuItem = new ToolStripMenuItem();
+            kvecinosToolStripMenuItem = new ToolStripMenuItem();
             mediaPonderadaToolStripMenuItem = new ToolStripMenuItem();
             pasoMediasToolStripMenuItem = new ToolStripMenuItem();
             pasoAltasToolStripMenuItem = new ToolStripMenuItem();
@@ -165,7 +165,7 @@
             // 
             // pasoBajasToolStripMenuItem
             // 
-            pasoBajasToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { gaussToolStripMenuItem, kmeansToolStripMenuItem, mediaPonderadaToolStripMenuItem });
+            pasoBajasToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { gaussToolStripMenuItem, kvecinosToolStripMenuItem, mediaPonderadaToolStripMenuItem });
             pasoBajasToolStripMenuItem.Name = "pasoBajasToolStripMenuItem";
             pasoBajasToolStripMenuItem.Size = new Size(224, 26);
             pasoBajasToolStripMenuItem.Text = "Paso Bajas";
@@ -174,21 +174,21 @@
             // gaussToolStripMenuItem
             // 
             gaussToolStripMenuItem.Name = "gaussToolStripMenuItem";
-            gaussToolStripMenuItem.Size = new Size(209, 26);
+            gaussToolStripMenuItem.Size = new Size(224, 26);
             gaussToolStripMenuItem.Text = "Gauss";
             gaussToolStripMenuItem.Click += gaussToolStripMenuItem_Click;
             // 
-            // kmeansToolStripMenuItem
+            // kvecinosToolStripMenuItem
             // 
-            kmeansToolStripMenuItem.Name = "kmeansToolStripMenuItem";
-            kmeansToolStripMenuItem.Size = new Size(209, 26);
-            kmeansToolStripMenuItem.Text = "K vecino";
-            kmeansToolStripMenuItem.Click += kmeansToolStripMenuItem_Click;
+            kvecinosToolStripMenuItem.Name = "kvecinosToolStripMenuItem";
+            kvecinosToolStripMenuItem.Size = new Size(224, 26);
+            kvecinosToolStripMenuItem.Text = "K vecino";
+            kvecinosToolStripMenuItem.Click += kvecinosToolStripMenuItem_Click;
             // 
             // mediaPonderadaToolStripMenuItem
             // 
             mediaPonderadaToolStripMenuItem.Name = "mediaPonderadaToolStripMenuItem";
-            mediaPonderadaToolStripMenuItem.Size = new Size(209, 26);
+            mediaPonderadaToolStripMenuItem.Size = new Size(224, 26);
             mediaPonderadaToolStripMenuItem.Text = "Media Ponderada";
             // 
             // pasoMediasToolStripMenuItem
@@ -247,7 +247,7 @@
         private ToolStripMenuItem pasoMediasToolStripMenuItem;
         private ToolStripMenuItem pasoAltasToolStripMenuItem;
         private ToolStripMenuItem gaussToolStripMenuItem;
-        private ToolStripMenuItem kmeansToolStripMenuItem;
+        private ToolStripMenuItem kvecinosToolStripMenuItem;
         private ToolStripMenuItem mediaPonderadaToolStripMenuItem;
     }
 }

@@ -1,3 +1,4 @@
+using System.Data;
 using System.Drawing.Imaging;
 namespace ConvolutionKernelOptimized
 {
@@ -176,8 +177,53 @@ namespace ConvolutionKernelOptimized
             original = resultante;
         }
 
-        private void kmeansToolStripMenuItem_Click(object sender, EventArgs e)
+        private unsafe void kvecinosToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if(original == null) return;
+            int W = 5;
+            int K = 10;
+            int offset = W / 2;
+            int width = original.Width;
+            int height = original.Height;
+            resultante =new Bitmap(width, height);
+            BitmapData dataOriginal = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataResultado = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOriginal.Scan0;
+            byte* ptrRes = (byte*)dataResultado.Scan0;
+            for(int x=0;x<width; x++ )
+            {
+                for(int y=0;y<height; y++)
+                {
+                    byte* centerPixel=ptrOri + (y * dataOriginal.Stride)+(x*4);
+                    List<(double dist, byte b, byte g, byte r)> neighbors = new List<(double, byte, byte, byte)>(W*W);
+                    for (int kx = 0; kx < W; kx++)
+                    {
+                        for (int ky = 0; ky < W; ky++)
+                        {
+                            int px = Math.Clamp(x + (kx - offset), 0, width - 1);
+                            int py = Math.Clamp(y + (ky - offset), 0, height - 1);
+                            byte* nPixel = ptrOri + (py* dataOriginal.Stride)+(px*4);
+
+                            double d = Math.Sqrt(Math.Pow(centerPixel[0] - nPixel[0],2)+ Math.Pow(centerPixel[1] - nPixel[1],2) + Math.Pow(centerPixel[2] - nPixel[2], 2));
+                            neighbors.Add((d, nPixel[0], nPixel[1], nPixel[2]));
+                        }
+                    }
+                    var kNearest = neighbors.OrderBy(n => n.dist).Take(K).ToList();
+                    double sumB = 0, sumG = 0, sumR = 0;
+                    foreach(var n in kNearest)
+                    {
+                        sumB += n.b; sumG += n.g;sumR += n.r;
+                    }
+                    byte* resPixel = ptrRes + (y * dataResultado.Stride) + (x * 4);
+                    resPixel[0] = (byte)(sumB / K);
+                    resPixel[1] = (byte)(sumG / K);
+                    resPixel[2] = (byte)(sumR / K);
+                    resPixel[3] = 255;
+                }
+            }
+            original.UnlockBits(dataOriginal);
+            resultante.UnlockBits(dataResultado);
+            pictureBox1.Image = resultante;
 
         }
 
