@@ -1,4 +1,4 @@
-﻿namespace Menu_01_practica41
+﻿namespace ConvolutionKernelOptimized
 {
     partial class Form1
     {
@@ -161,6 +161,7 @@
             filtrosToolStripMenuItem.Name = "filtrosToolStripMenuItem";
             filtrosToolStripMenuItem.Size = new Size(63, 24);
             filtrosToolStripMenuItem.Text = "Filtros";
+            filtrosToolStripMenuItem.Click += filtrosToolStripMenuItem_Click;
             // 
             // pasoBajasToolStripMenuItem
             // 
@@ -173,21 +174,21 @@
             // gaussToolStripMenuItem
             // 
             gaussToolStripMenuItem.Name = "gaussToolStripMenuItem";
-            gaussToolStripMenuItem.Size = new Size(224, 26);
+            gaussToolStripMenuItem.Size = new Size(209, 26);
             gaussToolStripMenuItem.Text = "Gauss";
             gaussToolStripMenuItem.Click += gaussToolStripMenuItem_Click;
             // 
             // kmeansToolStripMenuItem
             // 
             kmeansToolStripMenuItem.Name = "kmeansToolStripMenuItem";
-            kmeansToolStripMenuItem.Size = new Size(224, 26);
+            kmeansToolStripMenuItem.Size = new Size(209, 26);
             kmeansToolStripMenuItem.Text = "K vecino";
             kmeansToolStripMenuItem.Click += kmeansToolStripMenuItem_Click;
             // 
             // mediaPonderadaToolStripMenuItem
             // 
             mediaPonderadaToolStripMenuItem.Name = "mediaPonderadaToolStripMenuItem";
-            mediaPonderadaToolStripMenuItem.Size = new Size(224, 26);
+            mediaPonderadaToolStripMenuItem.Size = new Size(209, 26);
             mediaPonderadaToolStripMenuItem.Text = "Media Ponderada";
             // 
             // pasoMediasToolStripMenuItem

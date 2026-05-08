@@ -1,4 +1,4 @@
-namespace Menu_01_practica41
+namespace ConvolutionKernelOptimized
 {
     internal static class Program
     {

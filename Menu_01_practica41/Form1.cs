@@ -1,5 +1,5 @@
 using System.Drawing.Imaging;
-namespace Menu_01_practica41
+namespace ConvolutionKernelOptimized
 {
     public partial class Form1 : Form
     {
@@ -199,20 +199,20 @@ namespace Menu_01_practica41
                 for (int ky = 0; ky < W; ky++)
                 {
                     kernel[kx, ky] = Math.Exp(-0.5 * (Math.Pow((kx - mean) / sigma, 2.0) + Math.Pow((ky - mean) / sigma, 2.0))) / (2 * Math.PI * sigma * sigma);
-                    sum+=kernel[kx, ky];
+                    sum += kernel[kx, ky];
                 }
             }
             for (int kx = 0; kx < W; kx++)
                 for (int ky = 0; ky < W; ky++)
-                    kernel[kx, ky]/=sum;
+                    kernel[kx, ky] /= sum;
 
-            int width=original.Width;
-            int height=original.Height;
-            resultante=new Bitmap(width, height);
-            int offset=W / 2;
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+            int offset = W / 2;
 
-            BitmapData dataOri=original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            BitmapData dataRes=resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
 
             byte* ptrOri = (byte*)dataOri.Scan0;
             byte* ptrRes = (byte*)dataRes.Scan0;
@@ -239,15 +239,20 @@ namespace Menu_01_practica41
                     }
 
                     byte* resPixel = ptrRes + (y * dataRes.Stride) + (x * 4);
-                    resPixel[0]=(byte)Math.Clamp(b, 0, 255); 
-                    resPixel[1]=(byte)Math.Clamp(g, 0, 255);
-                    resPixel[2]=(byte)Math.Clamp(r, 0, 255);
-                    resPixel[3]=255;// Alpha
+                    resPixel[0] = (byte)Math.Clamp(b, 0, 255);
+                    resPixel[1] = (byte)Math.Clamp(g, 0, 255);
+                    resPixel[2] = (byte)Math.Clamp(r, 0, 255);
+                    resPixel[3] = 255;// Alpha
                 }
             }
             original.UnlockBits(dataOri);
             resultante.UnlockBits(dataRes);
-            pictureBox1.Image=resultante;
+            pictureBox1.Image = resultante;
+        }
+
+        private void filtrosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }
