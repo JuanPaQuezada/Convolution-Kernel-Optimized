@@ -31,7 +31,7 @@
             pictureBox1 = new PictureBox();
             menuStrip1 = new MenuStrip();
             cargarImagenToolStripMenuItem = new ToolStripMenuItem();
-            guardarImagenToolStripMenuItem = new ToolStripMenuItem();
+            abrirImagenToolStripMenuItem = new ToolStripMenuItem();
             guardarImagenToolStripMenuItem1 = new ToolStripMenuItem();
             salirToolStripMenuItem = new ToolStripMenuItem();
             preprocesamientoToolStripMenuItem = new ToolStripMenuItem();
@@ -75,29 +75,29 @@
             // 
             // cargarImagenToolStripMenuItem
             // 
-            cargarImagenToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { guardarImagenToolStripMenuItem, guardarImagenToolStripMenuItem1, salirToolStripMenuItem });
+            cargarImagenToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { abrirImagenToolStripMenuItem, guardarImagenToolStripMenuItem1, salirToolStripMenuItem });
             cargarImagenToolStripMenuItem.Name = "cargarImagenToolStripMenuItem";
             cargarImagenToolStripMenuItem.Size = new Size(73, 24);
             cargarImagenToolStripMenuItem.Text = "Archivo";
             // 
-            // guardarImagenToolStripMenuItem
+            // abrirImagenToolStripMenuItem
             // 
-            guardarImagenToolStripMenuItem.Name = "guardarImagenToolStripMenuItem";
-            guardarImagenToolStripMenuItem.Size = new Size(199, 26);
-            guardarImagenToolStripMenuItem.Text = "Cargar Imagen";
-            guardarImagenToolStripMenuItem.Click += guardarImagenToolStripMenuItem_Click;
+            abrirImagenToolStripMenuItem.Name = "abrirImagenToolStripMenuItem";
+            abrirImagenToolStripMenuItem.Size = new Size(224, 26);
+            abrirImagenToolStripMenuItem.Text = "Cargar Imagen";
+            abrirImagenToolStripMenuItem.Click += abrirImagenToolStripMenuItem_Click;
             // 
             // guardarImagenToolStripMenuItem1
             // 
             guardarImagenToolStripMenuItem1.Name = "guardarImagenToolStripMenuItem1";
-            guardarImagenToolStripMenuItem1.Size = new Size(199, 26);
+            guardarImagenToolStripMenuItem1.Size = new Size(224, 26);
             guardarImagenToolStripMenuItem1.Text = "Guardar imagen";
             guardarImagenToolStripMenuItem1.Click += guardarImagenToolStripMenuItem1_Click;
             // 
             // salirToolStripMenuItem
             // 
             salirToolStripMenuItem.Name = "salirToolStripMenuItem";
-            salirToolStripMenuItem.Size = new Size(199, 26);
+            salirToolStripMenuItem.Size = new Size(224, 26);
             salirToolStripMenuItem.Text = "Salir";
             // 
             // preprocesamientoToolStripMenuItem
@@ -190,6 +190,7 @@
             mediaPonderadaToolStripMenuItem.Name = "mediaPonderadaToolStripMenuItem";
             mediaPonderadaToolStripMenuItem.Size = new Size(224, 26);
             mediaPonderadaToolStripMenuItem.Text = "Media Ponderada";
+            mediaPonderadaToolStripMenuItem.Click += mediaPonderadaToolStripMenuItem_Click;
             // 
             // pasoMediasToolStripMenuItem
             // 
@@ -229,7 +230,7 @@
         private PictureBox pictureBox1;
         private MenuStrip menuStrip1;
         private ToolStripMenuItem cargarImagenToolStripMenuItem;
-        private ToolStripMenuItem guardarImagenToolStripMenuItem;
+        private ToolStripMenuItem abrirImagenToolStripMenuItem;
         private ToolStripMenuItem guardarImagenToolStripMenuItem1;
         private ToolStripMenuItem salirToolStripMenuItem;
         private OpenFileDialog openFileDialog1;

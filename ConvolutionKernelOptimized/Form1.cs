@@ -1,12 +1,13 @@
 using System.Data;
 using System.Drawing.Imaging;
+using System.Runtime.Intrinsics.X86;
 namespace ConvolutionKernelOptimized
 {
     public partial class Form1 : Form
     {
         public Bitmap objeto_bitmap = null!;
-        public Bitmap original = null!;
-        public Bitmap resultante = null!;
+        public Bitmap? original = null!;
+        public Bitmap? resultante = null!;
 
 
 
@@ -44,11 +45,11 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-
+            Image imagenAnterior = pictureBox1.Image;
             pictureBox1.Image = resultante;
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-
             original = resultante;
+            imagenAnterior?.Dispose();
         }
 
         private void grisesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -73,11 +74,12 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-
+            Image imagenAnterior = pictureBox1.Image;
             pictureBox1.Image = resultante;
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
 
             original = resultante;
+            imagenAnterior?.Dispose();
         }
 
         private void filtroRojoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -100,26 +102,37 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-
+            Image imagenAnterior = pictureBox1.Image;
             pictureBox1.Image = resultante;
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-
             original = resultante;
+            imagenAnterior?.Dispose();
         }
 
         private void guardarImagenToolStripMenuItem1_Click(object sender, EventArgs e)
         {
-            saveFileDialog1.ShowDialog();
-            objeto_bitmap.Save(saveFileDialog1.FileName);
+            if (resultante == null) return;
+            saveFileDialog1.Title = "Guardar imagen";
+            saveFileDialog1.Filter = "PNG Image|*.png|JPEG Image|*.jpg|Bitmap Image|*.bmp";
+            saveFileDialog1.DefaultExt = "png";
+            saveFileDialog1.AddExtension = true;
+            if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                resultante.Save(saveFileDialog1.FileName);
+            }
         }
 
-        private void guardarImagenToolStripMenuItem_Click(object sender, EventArgs e)
+        private void abrirImagenToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            resultante = original;
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                original = new Bitmap(openFileDialog1.FileName);
-                pictureBox1.Image = original;
-                pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+                if (openFileDialog1.FileName != null)
+                {
+                    original = new Bitmap(openFileDialog1.FileName);
+                    pictureBox1.Image = original;
+                    pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+                }
             }
         }
 
@@ -143,11 +156,11 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-
+            Image imagenAnterior = pictureBox1.Image;
             pictureBox1.Image = resultante;
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-
             original = resultante;
+            imagenAnterior?.Dispose();
         }
 
         private void filtroAzulToolStripMenuItem_Click(object sender, EventArgs e)
@@ -170,50 +183,65 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-
+            Image imagenAnterior = pictureBox1.Image;
             pictureBox1.Image = resultante;
             pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-
             original = resultante;
+            imagenAnterior?.Dispose();
         }
 
         private unsafe void kvecinosToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if(original == null) return;
-            int W = 5;
-            int K = 10;
+            if (original == null) return;
+            int W = 11;
+            int K = 40;
             int offset = W / 2;
             int width = original.Width;
             int height = original.Height;
-            resultante =new Bitmap(width, height);
+            resultante = new Bitmap(width, height);
+
             BitmapData dataOriginal = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             BitmapData dataResultado = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
             byte* ptrOri = (byte*)dataOriginal.Scan0;
             byte* ptrRes = (byte*)dataResultado.Scan0;
-            for(int x=0;x<width; x++ )
+
+            var vecinos = new (double dist, byte b, byte g, byte r)[W * W];
+
+            for (int x = 0; x < width; x++)
             {
-                for(int y=0;y<height; y++)
+                for (int y = 0; y < height; y++)
                 {
-                    byte* centerPixel=ptrOri + (y * dataOriginal.Stride)+(x*4);
-                    List<(double dist, byte b, byte g, byte r)> neighbors = new List<(double, byte, byte, byte)>(W*W);
+                    byte* centerPixel = ptrOri + (y * dataOriginal.Stride) + (x * 4);
+                    int count = 0;
+
                     for (int kx = 0; kx < W; kx++)
                     {
                         for (int ky = 0; ky < W; ky++)
                         {
                             int px = Math.Clamp(x + (kx - offset), 0, width - 1);
                             int py = Math.Clamp(y + (ky - offset), 0, height - 1);
-                            byte* nPixel = ptrOri + (py* dataOriginal.Stride)+(px*4);
+                            byte* nPixel = ptrOri + (py * dataOriginal.Stride) + (px * 4);
 
-                            double d = Math.Sqrt(Math.Pow(centerPixel[0] - nPixel[0],2)+ Math.Pow(centerPixel[1] - nPixel[1],2) + Math.Pow(centerPixel[2] - nPixel[2], 2));
-                            neighbors.Add((d, nPixel[0], nPixel[1], nPixel[2]));
+                            double d = Math.Pow(centerPixel[0] - nPixel[0], 2) +
+                                       Math.Pow(centerPixel[1] - nPixel[1], 2) +
+                                       Math.Pow(centerPixel[2] - nPixel[2], 2);
+
+                            vecinos[count] = (d, nPixel[0], nPixel[1], nPixel[2]);
+                            count++;
                         }
                     }
-                    var kNearest = neighbors.OrderBy(n => n.dist).Take(K).ToList();
+
+                    QuickSort(vecinos, 0, (W * W) - 1);
+
                     double sumB = 0, sumG = 0, sumR = 0;
-                    foreach(var n in kNearest)
+                    for (int i = 0; i < K; i++)
                     {
-                        sumB += n.b; sumG += n.g;sumR += n.r;
+                        sumB += vecinos[i].b;
+                        sumG += vecinos[i].g;
+                        sumR += vecinos[i].r;
                     }
+
                     byte* resPixel = ptrRes + (y * dataResultado.Stride) + (x * 4);
                     resPixel[0] = (byte)(sumB / K);
                     resPixel[1] = (byte)(sumG / K);
@@ -223,10 +251,37 @@ namespace ConvolutionKernelOptimized
             }
             original.UnlockBits(dataOriginal);
             resultante.UnlockBits(dataResultado);
-            pictureBox1.Image = resultante;
 
+            Image imagenAnterior = pictureBox1.Image;
+            pictureBox1.Image = resultante;
+            original = resultante;
+            imagenAnterior?.Dispose();
         }
 
+        private static void QuickSort((double dist, byte b, byte g, byte r)[] arr, int left, int right)
+        {
+            if (left < right)
+            {
+                int pivotIndex = PartitionVecinos(arr, left, right);
+                QuickSort(arr, left, pivotIndex - 1);
+                QuickSort(arr, pivotIndex + 1, right);
+            }
+        }
+        private static int PartitionVecinos((double dist, byte b, byte g, byte r)[] arr, int left, int right)
+        {
+            double pivotValue = arr[right].dist;
+            int i = left - 1;
+            for (int j = left; j < right; j++)
+            {
+                if (arr[j].dist <= pivotValue)
+                {
+                    i++;
+                    (arr[i], arr[j]) = (arr[j], arr[i]);
+                }
+            }
+            (arr[i + 1], arr[right]) = (arr[right], arr[i + 1]);
+            return i + 1;
+        }
         private void pasoBajasToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
@@ -293,12 +348,69 @@ namespace ConvolutionKernelOptimized
             }
             original.UnlockBits(dataOri);
             resultante.UnlockBits(dataRes);
+            Image imagenAnterior = pictureBox1.Image;
             pictureBox1.Image = resultante;
+            original = resultante;
+            imagenAnterior?.Dispose();
         }
 
         private void filtrosToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private unsafe void mediaPonderadaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+            int W = 3;
+            int offset = W / 2;
+            int[,] kernel = new int[,]
+            {
+                {1,2,1 },
+                {2,4,2 },
+                {1,2,1 }
+            };
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+            for (int x = 0; x < width; x++)
+            {
+                for (int y = 0; y < height; y++)
+                {
+                    double b = 0, g = 0, r = 0;
+                    for (int kx = 0; kx < W; kx++)
+                    {
+                        
+                            for (int ky = 0; ky < W; ky++)
+                            {
+                                int px = Math.Clamp(x + (kx - offset), 0, original.Width - 1);
+                                int py = Math.Clamp(y + (ky - offset), 0, original.Height - 1);
+                                byte* pixelActual = ptrOri + (py * dataOri.Stride) + (px * 4);
+
+                                b += pixelActual[0] * kernel[kx, ky];
+                                g += pixelActual[1] * kernel[kx, ky];
+                                r += pixelActual[2] * kernel[kx, ky];
+
+                            }
+                       
+                    }
+                    byte* resPixel = ptrRes + (y * dataRes.Stride) + (x * 4);
+                    resPixel[0] = (byte)Math.Clamp(b / 16, 0, 255);
+                    resPixel[1] = (byte)Math.Clamp(g / 16, 0, 255);
+                    resPixel[2] = (byte)Math.Clamp(r / 16, 0, 255);
+                    resPixel[3] = 255;// Alpha
+                }
+            }
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+            Image imagenAnterior = pictureBox1.Image;
+            pictureBox1.Image = resultante;
+            original = resultante;
+            imagenAnterior?.Dispose();
         }
     }
 }
