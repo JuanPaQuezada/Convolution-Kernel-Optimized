@@ -52,7 +52,12 @@
             kvecinosToolStripMenuItem = new ToolStripMenuItem();
             mediaPonderadaToolStripMenuItem = new ToolStripMenuItem();
             pasoMediasToolStripMenuItem = new ToolStripMenuItem();
+            x3ToolStripMenuItem = new ToolStripMenuItem();
+            x5ToolStripMenuItem = new ToolStripMenuItem();
+            x7ToolStripMenuItem = new ToolStripMenuItem();
             pasoAltasToolStripMenuItem = new ToolStripMenuItem();
+            sobelToolStripMenuItem = new ToolStripMenuItem();
+            bordesToolStripMenuItem = new ToolStripMenuItem();
             histogramaToolStripMenuItem = new ToolStripMenuItem();
             histogramaDeColorToolStripMenuItem = new ToolStripMenuItem();
             histogramaDeColorAzulToolStripMenuItem = new ToolStripMenuItem();
@@ -60,6 +65,7 @@
             histogramaRGBToolStripMenuItem = new ToolStripMenuItem();
             openFileDialog1 = new OpenFileDialog();
             saveFileDialog1 = new SaveFileDialog();
+            intensoToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             menuStrip1.SuspendLayout();
             SuspendLayout();
@@ -119,14 +125,14 @@
             // negativoToolStripMenuItem
             // 
             negativoToolStripMenuItem.Name = "negativoToolStripMenuItem";
-            negativoToolStripMenuItem.Size = new Size(224, 26);
+            negativoToolStripMenuItem.Size = new Size(173, 26);
             negativoToolStripMenuItem.Text = "Negativo";
             negativoToolStripMenuItem.Click += negativoToolStripMenuItem_Click;
             // 
             // grisesToolStripMenuItem
             // 
             grisesToolStripMenuItem.Name = "grisesToolStripMenuItem";
-            grisesToolStripMenuItem.Size = new Size(224, 26);
+            grisesToolStripMenuItem.Size = new Size(173, 26);
             grisesToolStripMenuItem.Text = "Grises";
             grisesToolStripMenuItem.Click += grisesToolStripMenuItem_Click;
             // 
@@ -134,26 +140,26 @@
             // 
             potenciaToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { abrillantarToolStripMenuItem, oscurecerToolStripMenuItem });
             potenciaToolStripMenuItem.Name = "potenciaToolStripMenuItem";
-            potenciaToolStripMenuItem.Size = new Size(224, 26);
+            potenciaToolStripMenuItem.Size = new Size(173, 26);
             potenciaToolStripMenuItem.Text = "Potencia";
             // 
             // abrillantarToolStripMenuItem
             // 
             abrillantarToolStripMenuItem.Name = "abrillantarToolStripMenuItem";
-            abrillantarToolStripMenuItem.Size = new Size(224, 26);
+            abrillantarToolStripMenuItem.Size = new Size(162, 26);
             abrillantarToolStripMenuItem.Text = "Abrillantar";
             // 
             // oscurecerToolStripMenuItem
             // 
             oscurecerToolStripMenuItem.Name = "oscurecerToolStripMenuItem";
-            oscurecerToolStripMenuItem.Size = new Size(224, 26);
+            oscurecerToolStripMenuItem.Size = new Size(162, 26);
             oscurecerToolStripMenuItem.Text = "Oscurecer";
             oscurecerToolStripMenuItem.Click += oscurecerToolStripMenuItem_Click;
             // 
             // binarizacionToolStripMenuItem
             // 
             binarizacionToolStripMenuItem.Name = "binarizacionToolStripMenuItem";
-            binarizacionToolStripMenuItem.Size = new Size(224, 26);
+            binarizacionToolStripMenuItem.Size = new Size(173, 26);
             binarizacionToolStripMenuItem.Text = "Binarizacion";
             binarizacionToolStripMenuItem.Click += binarizacionToolStripMenuItem_Click;
             // 
@@ -190,6 +196,7 @@
             colorearImagenToolStripMenuItem.Name = "colorearImagenToolStripMenuItem";
             colorearImagenToolStripMenuItem.Size = new Size(203, 26);
             colorearImagenToolStripMenuItem.Text = "Colorear imagen";
+            colorearImagenToolStripMenuItem.Click += colorearImagenToolStripMenuItem_Click;
             // 
             // filtrosToolStripMenuItem
             // 
@@ -203,7 +210,7 @@
             // 
             pasoBajasToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { gaussToolStripMenuItem, kvecinosToolStripMenuItem, mediaPonderadaToolStripMenuItem });
             pasoBajasToolStripMenuItem.Name = "pasoBajasToolStripMenuItem";
-            pasoBajasToolStripMenuItem.Size = new Size(174, 26);
+            pasoBajasToolStripMenuItem.Size = new Size(224, 26);
             pasoBajasToolStripMenuItem.Text = "Paso Bajas";
             pasoBajasToolStripMenuItem.Click += pasoBajasToolStripMenuItem_Click;
             // 
@@ -230,15 +237,52 @@
             // 
             // pasoMediasToolStripMenuItem
             // 
+            pasoMediasToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { x3ToolStripMenuItem, x5ToolStripMenuItem, x7ToolStripMenuItem });
             pasoMediasToolStripMenuItem.Name = "pasoMediasToolStripMenuItem";
-            pasoMediasToolStripMenuItem.Size = new Size(174, 26);
+            pasoMediasToolStripMenuItem.Size = new Size(224, 26);
             pasoMediasToolStripMenuItem.Text = "Paso Medias";
+            // 
+            // x3ToolStripMenuItem
+            // 
+            x3ToolStripMenuItem.Name = "x3ToolStripMenuItem";
+            x3ToolStripMenuItem.Size = new Size(115, 26);
+            x3ToolStripMenuItem.Text = "3x3";
+            x3ToolStripMenuItem.Click += x3ToolStripMenuItem_Click;
+            // 
+            // x5ToolStripMenuItem
+            // 
+            x5ToolStripMenuItem.Name = "x5ToolStripMenuItem";
+            x5ToolStripMenuItem.Size = new Size(115, 26);
+            x5ToolStripMenuItem.Text = "5x5";
+            x5ToolStripMenuItem.Click += x5ToolStripMenuItem_Click;
+            // 
+            // x7ToolStripMenuItem
+            // 
+            x7ToolStripMenuItem.Name = "x7ToolStripMenuItem";
+            x7ToolStripMenuItem.Size = new Size(115, 26);
+            x7ToolStripMenuItem.Text = "7x7";
+            x7ToolStripMenuItem.Click += x7ToolStripMenuItem_Click;
             // 
             // pasoAltasToolStripMenuItem
             // 
+            pasoAltasToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { sobelToolStripMenuItem, bordesToolStripMenuItem, intensoToolStripMenuItem });
             pasoAltasToolStripMenuItem.Name = "pasoAltasToolStripMenuItem";
-            pasoAltasToolStripMenuItem.Size = new Size(174, 26);
+            pasoAltasToolStripMenuItem.Size = new Size(224, 26);
             pasoAltasToolStripMenuItem.Text = "Paso Altas";
+            // 
+            // sobelToolStripMenuItem
+            // 
+            sobelToolStripMenuItem.Name = "sobelToolStripMenuItem";
+            sobelToolStripMenuItem.Size = new Size(224, 26);
+            sobelToolStripMenuItem.Text = "Sobel";
+            sobelToolStripMenuItem.Click += sobelToolStripMenuItem_Click;
+            // 
+            // bordesToolStripMenuItem
+            // 
+            bordesToolStripMenuItem.Name = "bordesToolStripMenuItem";
+            bordesToolStripMenuItem.Size = new Size(224, 26);
+            bordesToolStripMenuItem.Text = "Bordes";
+            bordesToolStripMenuItem.Click += bordesToolStripMenuItem_Click;
             // 
             // histogramaToolStripMenuItem
             // 
@@ -278,6 +322,13 @@
             // openFileDialog1
             // 
             openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // intensoToolStripMenuItem
+            // 
+            intensoToolStripMenuItem.Name = "intensoToolStripMenuItem";
+            intensoToolStripMenuItem.Size = new Size(224, 26);
+            intensoToolStripMenuItem.Text = "Intenso";
+            intensoToolStripMenuItem.Click += intensoToolStripMenuItem_Click;
             // 
             // Form1
             // 
@@ -330,5 +381,11 @@
         private ToolStripMenuItem abrillantarToolStripMenuItem;
         private ToolStripMenuItem oscurecerToolStripMenuItem;
         private ToolStripMenuItem binarizacionToolStripMenuItem;
+        private ToolStripMenuItem x3ToolStripMenuItem;
+        private ToolStripMenuItem x5ToolStripMenuItem;
+        private ToolStripMenuItem x7ToolStripMenuItem;
+        private ToolStripMenuItem sobelToolStripMenuItem;
+        private ToolStripMenuItem bordesToolStripMenuItem;
+        private ToolStripMenuItem intensoToolStripMenuItem;
     }
 }

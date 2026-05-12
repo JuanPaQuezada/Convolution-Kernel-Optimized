@@ -721,5 +721,249 @@ namespace ConvolutionKernelOptimized
             imagenAnterior?.Dispose();
         }
 
+        private unsafe void colorearImagenToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            ColorDialog selectorColor = new ColorDialog();
+            selectorColor.AllowFullOpen = true;
+
+            if (selectorColor.ShowDialog() == DialogResult.OK)
+            {
+                Color colorFiltro = selectorColor.Color;
+
+                int width = original.Width;
+                int height = original.Height;
+                resultante = new Bitmap(width, height);
+
+                BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+                BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+                byte* ptrOri = (byte*)dataOri.Scan0;
+                byte* ptrRes = (byte*)dataRes.Scan0;
+
+                double factorR = colorFiltro.R / 255.0;
+                double factorG = colorFiltro.G / 255.0;
+                double factorB = colorFiltro.B / 255.0;
+
+                for (int y = 0; y < height; y++)
+                {
+                    for (int x = 0; x < width; x++)
+                    {
+                        byte* pOri = ptrOri + (y * dataOri.Stride) + (x * 4);
+                        byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+
+                        double gris = (pOri[2] * 0.299) + (pOri[1] * 0.587) + (pOri[0] * 0.114);
+
+                        pRes[0] = (byte)Math.Clamp(gris * factorB, 0, 255);
+                        pRes[1] = (byte)Math.Clamp(gris * factorG, 0, 255);
+                        pRes[2] = (byte)Math.Clamp(gris * factorR, 0, 255);
+                        pRes[3] = pOri[3];
+                    }
+                }
+
+                original.UnlockBits(dataOri);
+                resultante.UnlockBits(dataRes);
+
+                ActualizarInterfaz();
+            }
+        }
+        private unsafe void AplicarFiltroMedia(int W)
+        {
+            if (original == null) return;
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+            int offset = W / 2;
+            int size = W * W;
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int b = 0, g = 0, r = 0;
+
+                    for (int ky = 0; ky < W; ky++)
+                    {
+                        for (int kx = 0; kx < W; kx++)
+                        {
+                            int px = Math.Clamp(x + (kx - offset), 0, width - 1);
+                            int py = Math.Clamp(y + (ky - offset), 0, height - 1);
+                            byte* pOri = ptrOri + (py * dataOri.Stride) + (px * 4);
+
+                            b += pOri[0];
+                            g += pOri[1];
+                            r += pOri[2];
+                        }
+                    }
+
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+                    pRes[0] = (byte)(b / size);
+                    pRes[1] = (byte)(g / size);
+                    pRes[2] = (byte)(r / size);
+                    pRes[3] = 255;
+                }
+            }
+
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+            ActualizarInterfaz();
+        }
+
+        private void x3ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AplicarFiltroMedia(3);
+        }
+
+        private void x5ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AplicarFiltroMedia(5);
+        }
+
+        private void x7ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AplicarFiltroMedia(7);
+        }
+
+        private unsafe void aplicarPasoAltas(int[,] kernel)
+        {
+            if (original == null) return;
+            int W = 3;
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+            int offset = 1;
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    double b = 0, g = 0, r = 0;
+                    for (int ky = 0; ky < W; ky++)
+                    {
+                        for (int kx = 0; kx < W; kx++)
+                        {
+                            int px = Math.Clamp(x + (kx - offset), 0, width - 1);
+                            int py = Math.Clamp(y + (ky - offset), 0, height - 1);
+                            byte* pOri = ptrOri + (py * dataOri.Stride) + (px * 4);
+
+                            b += pOri[0] * kernel[ky, kx];
+                            g += pOri[1] * kernel[ky, kx];
+                            r += pOri[2] * kernel[ky, kx];
+                        }
+                    }
+
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+
+                    // 1. CORRECCIÓN: Asignamos los valores calculados usando Clamp
+                    pRes[0] = (byte)Math.Clamp(b, 0, 255);
+                    pRes[1] = (byte)Math.Clamp(g, 0, 255);
+                    pRes[2] = (byte)Math.Clamp(r, 0, 255);
+                    pRes[3] = 255; // Opacidad total
+                }
+            }
+
+            // 2. CORRECCIÓN: Movimos esto FUERA de los ciclos for (x, y)
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+            ActualizarInterfaz();
+        }
+
+        private unsafe void sobelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+            int offset = 1;
+
+            int[,] gx = new int[,] {
+                { -1,  0,  1 },
+                { -2,  0,  2 },
+                { -1,  0,  1 }
+            };
+
+            int[,] gy = new int[,] {
+                { -1, -2, -1 },
+                {  0,  0,  0 },
+                {  1,  2,  1 }
+            };
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    double bx = 0, gx_val = 0, rx = 0;
+                    double by = 0, gy_val = 0, ry = 0;
+
+                    for (int ky = 0; ky < 3; ky++)
+                    {
+                        for (int kx = 0; kx < 3; kx++)
+                        {
+                            int px = Math.Clamp(x + (kx - offset), 0, width - 1);
+                            int py = Math.Clamp(y + (ky - offset), 0, height - 1);
+                            byte* pOri = ptrOri + (py * dataOri.Stride) + (px * 4);
+
+                            bx += pOri[0] * gx[ky, kx];
+                            gx_val += pOri[1] * gx[ky, kx];
+                            rx += pOri[2] * gx[ky, kx];
+
+                            by += pOri[0] * gy[ky, kx];
+                            gy_val += pOri[1] * gy[ky, kx];
+                            ry += pOri[2] * gy[ky, kx];
+                        }
+                    }
+
+                    double b = Math.Sqrt((bx * bx) + (by * by));
+                    double g = Math.Sqrt((gx_val * gx_val) + (gy_val * gy_val));
+                    double r = Math.Sqrt((rx * rx) + (ry * ry));
+
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+                    pRes[0] = (byte)Math.Clamp(b, 0, 255);
+                    pRes[1] = (byte)Math.Clamp(g, 0, 255);
+                    pRes[2] = (byte)Math.Clamp(r, 0, 255);
+                    pRes[3] = 255;
+                }
+            }
+
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+            ActualizarInterfaz();
+        }
+
+        private void bordesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int[,] kernel = new int[,] {
+                { -1, -1, -1 },
+                { -1,  8, -1 },
+                { -1, -1, -1 }
+            };
+            aplicarPasoAltas(kernel);
+        }
+
+        private void intensoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int[,] kernel = new int[,] {
+                { -1, -1, -1 },
+                { -1,  9, -1 },
+                { -1, -1, -1 }
+            };
+            aplicarPasoAltas(kernel);
+        }
     }
 }
+
