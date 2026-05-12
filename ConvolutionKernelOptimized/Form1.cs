@@ -45,11 +45,7 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-            Image imagenAnterior = pictureBox1.Image;
-            pictureBox1.Image = resultante;
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            original = resultante;
-            imagenAnterior?.Dispose();
+            ActualizarInterfaz();
         }
 
         private void grisesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -74,12 +70,7 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-            Image imagenAnterior = pictureBox1.Image;
-            pictureBox1.Image = resultante;
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-
-            original = resultante;
-            imagenAnterior?.Dispose();
+            ActualizarInterfaz();
         }
 
         private void filtroRojoToolStripMenuItem_Click(object sender, EventArgs e)
@@ -102,11 +93,7 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-            Image imagenAnterior = pictureBox1.Image;
-            pictureBox1.Image = resultante;
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            original = resultante;
-            imagenAnterior?.Dispose();
+            ActualizarInterfaz();
         }
 
         private void guardarImagenToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -156,11 +143,7 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-            Image imagenAnterior = pictureBox1.Image;
-            pictureBox1.Image = resultante;
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            original = resultante;
-            imagenAnterior?.Dispose();
+            ActualizarInterfaz();
         }
 
         private void filtroAzulToolStripMenuItem_Click(object sender, EventArgs e)
@@ -183,11 +166,7 @@ namespace ConvolutionKernelOptimized
                     resultante.SetPixel(x, y, rColor);
                 }
             }
-            Image imagenAnterior = pictureBox1.Image;
-            pictureBox1.Image = resultante;
-            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
-            original = resultante;
-            imagenAnterior?.Dispose();
+            ActualizarInterfaz();
         }
 
         private unsafe void kvecinosToolStripMenuItem_Click(object sender, EventArgs e)
@@ -251,11 +230,7 @@ namespace ConvolutionKernelOptimized
             }
             original.UnlockBits(dataOriginal);
             resultante.UnlockBits(dataResultado);
-
-            Image imagenAnterior = pictureBox1.Image;
-            pictureBox1.Image = resultante;
-            original = resultante;
-            imagenAnterior?.Dispose();
+            ActualizarInterfaz();
         }
 
         private static void QuickSort((double dist, byte b, byte g, byte r)[] arr, int left, int right)
@@ -348,10 +323,7 @@ namespace ConvolutionKernelOptimized
             }
             original.UnlockBits(dataOri);
             resultante.UnlockBits(dataRes);
-            Image imagenAnterior = pictureBox1.Image;
-            pictureBox1.Image = resultante;
-            original = resultante;
-            imagenAnterior?.Dispose();
+            ActualizarInterfaz();
         }
 
         private void filtrosToolStripMenuItem_Click(object sender, EventArgs e)
@@ -384,19 +356,19 @@ namespace ConvolutionKernelOptimized
                     double b = 0, g = 0, r = 0;
                     for (int kx = 0; kx < W; kx++)
                     {
-                        
-                            for (int ky = 0; ky < W; ky++)
-                            {
-                                int px = Math.Clamp(x + (kx - offset), 0, original.Width - 1);
-                                int py = Math.Clamp(y + (ky - offset), 0, original.Height - 1);
-                                byte* pixelActual = ptrOri + (py * dataOri.Stride) + (px * 4);
 
-                                b += pixelActual[0] * kernel[kx, ky];
-                                g += pixelActual[1] * kernel[kx, ky];
-                                r += pixelActual[2] * kernel[kx, ky];
+                        for (int ky = 0; ky < W; ky++)
+                        {
+                            int px = Math.Clamp(x + (kx - offset), 0, original.Width - 1);
+                            int py = Math.Clamp(y + (ky - offset), 0, original.Height - 1);
+                            byte* pixelActual = ptrOri + (py * dataOri.Stride) + (px * 4);
 
-                            }
-                       
+                            b += pixelActual[0] * kernel[kx, ky];
+                            g += pixelActual[1] * kernel[kx, ky];
+                            r += pixelActual[2] * kernel[kx, ky];
+
+                        }
+
                     }
                     byte* resPixel = ptrRes + (y * dataRes.Stride) + (x * 4);
                     resPixel[0] = (byte)Math.Clamp(b / 16, 0, 255);
@@ -407,10 +379,347 @@ namespace ConvolutionKernelOptimized
             }
             original.UnlockBits(dataOri);
             resultante.UnlockBits(dataRes);
+            ActualizarInterfaz();
+        }
+
+        private unsafe void histogramaDeColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+            int[] conteoRojo = new int[256];
+            int width = original.Width;
+            int height = original.Height;
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    byte* pixelActual = ptrOri + (y * dataOri.Stride) + (x * 4);
+
+                    byte rojo = pixelActual[2];
+                    conteoRojo[rojo]++;
+                }
+            }
+            original.UnlockBits(dataOri);
+
+            int maxValor = 0;
+            for (int i = 0; i < 256; i++)
+            {
+                if (conteoRojo[i] > maxValor)
+                {
+                    maxValor = conteoRojo[i];
+                }
+            }
+            if (maxValor == 0) maxValor = 1;
+
+            Bitmap bmpHistograma = new Bitmap(256, 200);
+            using (Graphics g = Graphics.FromImage(bmpHistograma))
+            {
+                g.Clear(Color.White); // Fondo blanco
+
+                for (int i = 0; i < 256; i++)
+                {
+                    int altura = (int)((double)conteoRojo[i] / maxValor * 200);
+
+                    g.DrawLine(Pens.Red, i, 200, i, 200 - altura);
+                }
+            }
+
+            Form ventanaHist = new Form();
+            ventanaHist.Text = "Histograma de Color Rojo";
+            ventanaHist.ClientSize = new Size(276, 220);
+            ventanaHist.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            ventanaHist.StartPosition = FormStartPosition.CenterParent;
+
+            PictureBox pbHist = new PictureBox();
+            pbHist.Image = bmpHistograma;
+            pbHist.Dock = DockStyle.Fill;
+            pbHist.SizeMode = PictureBoxSizeMode.CenterImage;
+
+            ventanaHist.Controls.Add(pbHist);
+            ventanaHist.Show();
+        }
+
+        private unsafe void histogramaDeColorAzulToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            int[] conteoAzul = new int[256];
+            int width = original.Width;
+            int height = original.Height;
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    byte* pixelActual = ptrOri + (y * dataOri.Stride) + (x * 4);
+                    conteoAzul[pixelActual[0]]++;
+                }
+            }
+            original.UnlockBits(dataOri);
+
+            int maxValor = 0;
+            for (int i = 0; i < 256; i++)
+            {
+                if (conteoAzul[i] > maxValor) maxValor = conteoAzul[i];
+            }
+            if (maxValor == 0) maxValor = 1;
+
+            Bitmap bmpHistograma = new Bitmap(256, 200);
+            using (Graphics g = Graphics.FromImage(bmpHistograma))
+            {
+                g.Clear(Color.White);
+                for (int i = 0; i < 256; i++)
+                {
+                    int altura = (int)((double)conteoAzul[i] / maxValor * 200);
+                    g.DrawLine(Pens.Blue, i, 200, i, 200 - altura);
+                }
+            }
+
+            Form ventanaHist = new Form();
+            ventanaHist.Text = "Histograma de Color Azul";
+            ventanaHist.ClientSize = new Size(276, 220);
+            ventanaHist.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            ventanaHist.StartPosition = FormStartPosition.CenterParent;
+
+            PictureBox pbHist = new PictureBox();
+            pbHist.Image = bmpHistograma;
+            pbHist.Dock = DockStyle.Fill;
+            pbHist.SizeMode = PictureBoxSizeMode.CenterImage;
+
+            ventanaHist.Controls.Add(pbHist);
+            ventanaHist.Show();
+        }
+
+        private unsafe void histogramaDeColorVerdeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            int[] conteoVerde = new int[256];
+            int width = original.Width;
+            int height = original.Height;
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    byte* pixelActual = ptrOri + (y * dataOri.Stride) + (x * 4);
+                    conteoVerde[pixelActual[1]]++;
+                }
+            }
+            original.UnlockBits(dataOri);
+
+            int maxValor = 0;
+            for (int i = 0; i < 256; i++)
+            {
+                if (conteoVerde[i] > maxValor) maxValor = conteoVerde[i];
+            }
+            if (maxValor == 0) maxValor = 1;
+
+            Bitmap bmpHistograma = new Bitmap(256, 200);
+            using (Graphics g = Graphics.FromImage(bmpHistograma))
+            {
+                g.Clear(Color.White);
+                for (int i = 0; i < 256; i++)
+                {
+                    int altura = (int)((double)conteoVerde[i] / maxValor * 200);
+                    g.DrawLine(Pens.Green, i, 200, i, 200 - altura);
+                }
+            }
+
+            Form ventanaHist = new Form();
+            ventanaHist.Text = "Histograma de Color Verde";
+            ventanaHist.ClientSize = new Size(276, 220);
+            ventanaHist.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            ventanaHist.StartPosition = FormStartPosition.CenterParent;
+
+            PictureBox pbHist = new PictureBox();
+            pbHist.Image = bmpHistograma;
+            pbHist.Dock = DockStyle.Fill;
+            pbHist.SizeMode = PictureBoxSizeMode.CenterImage;
+
+            ventanaHist.Controls.Add(pbHist);
+            ventanaHist.Show();
+        }
+
+        private unsafe void histogramaRGBToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            int[] conteoR = new int[256];
+            int[] conteoG = new int[256];
+            int[] conteoB = new int[256];
+            int width = original.Width;
+            int height = original.Height;
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    byte* pixelActual = ptrOri + (y * dataOri.Stride) + (x * 4);
+                    conteoB[pixelActual[0]]++;
+                    conteoG[pixelActual[1]]++;
+                    conteoR[pixelActual[2]]++;
+                }
+            }
+            original.UnlockBits(dataOri);
+
+            int maxValor = 0;
+            for (int i = 0; i < 256; i++)
+            {
+                if (conteoR[i] > maxValor) maxValor = conteoR[i];
+                if (conteoG[i] > maxValor) maxValor = conteoG[i];
+                if (conteoB[i] > maxValor) maxValor = conteoB[i];
+            }
+            if (maxValor == 0) maxValor = 1;
+
+            Bitmap bmpHistograma = new Bitmap(256, 200);
+            using (Graphics g = Graphics.FromImage(bmpHistograma))
+            {
+                g.Clear(Color.White);
+
+                for (int i = 0; i < 256; i++)
+                {
+                    int altR = (int)((double)conteoR[i] / maxValor * 200);
+                    int altG = (int)((double)conteoG[i] / maxValor * 200);
+                    int altB = (int)((double)conteoB[i] / maxValor * 200);
+
+                    g.DrawLine(new Pen(Color.FromArgb(150, Color.Red)), i, 200, i, 200 - altR);
+                    g.DrawLine(new Pen(Color.FromArgb(150, Color.Green)), i, 200, i, 200 - altG);
+                    g.DrawLine(new Pen(Color.FromArgb(150, Color.Blue)), i, 200, i, 200 - altB);
+                }
+            }
+
+            Form ventanaHist = new Form();
+            ventanaHist.Text = "Histograma RGB Combinado";
+            ventanaHist.ClientSize = new Size(276, 220);
+            ventanaHist.FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            ventanaHist.StartPosition = FormStartPosition.CenterParent;
+
+            PictureBox pbHist = new PictureBox();
+            pbHist.Image = bmpHistograma;
+            pbHist.Dock = DockStyle.Fill;
+            pbHist.SizeMode = PictureBoxSizeMode.CenterImage;
+
+            ventanaHist.Controls.Add(pbHist);
+            ventanaHist.Show();
+        }
+
+        private unsafe void binarizacionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+
+            int umbral = 128;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    byte* pOri = ptrOri + (y * dataOri.Stride) + (x * 4);
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+                    int promedio = (pOri[0] + pOri[1] + pOri[2]) / 3;
+                    byte binario = (byte)(promedio > umbral ? 255 : 0);
+
+                    pRes[0] = binario;
+                    pRes[1] = binario;
+                    pRes[2] = binario;
+                    pRes[3] = 255;
+                }
+            }
+
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+
+            ActualizarInterfaz();
+        }
+
+        private unsafe void abrillantarToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+            int brillo = 30;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    byte* pOri = ptrOri + (y * dataOri.Stride) + (x * 4);
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+                    pRes[0] = (byte)Math.Clamp(pOri[0] + brillo, 0, 255);
+                    pRes[1] = (byte)Math.Clamp(pOri[1] + brillo, 0, 255);
+                    pRes[2] = (byte)Math.Clamp(pOri[2] + brillo, 0, 255);
+                    pRes[3] = pOri[3];
+                }
+            }
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+            ActualizarInterfaz();
+        }
+
+        private unsafe void oscurecerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+            int oscuridad = 30;
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    byte* pOri = ptrOri + (y * dataOri.Stride) + (x * 4);
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+                    pRes[0] = (byte)Math.Clamp(pOri[0] - oscuridad, 0, 255);
+                    pRes[1] = (byte)Math.Clamp(pOri[1] - oscuridad, 0, 255);
+                    pRes[2] = (byte)Math.Clamp(pOri[2] - oscuridad, 0, 255);
+                    pRes[3] = pOri[3];
+                }
+            }
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+            ActualizarInterfaz();
+        }
+
+        private void ActualizarInterfaz()
+        {
             Image imagenAnterior = pictureBox1.Image;
             pictureBox1.Image = resultante;
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
             original = resultante;
             imagenAnterior?.Dispose();
         }
+
     }
 }
