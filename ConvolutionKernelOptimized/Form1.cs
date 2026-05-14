@@ -864,7 +864,6 @@ namespace ConvolutionKernelOptimized
 
                     byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
 
-                    // 1. CORRECCIÓN: Asignamos los valores calculados usando Clamp
                     pRes[0] = (byte)Math.Clamp(b, 0, 255);
                     pRes[1] = (byte)Math.Clamp(g, 0, 255);
                     pRes[2] = (byte)Math.Clamp(r, 0, 255);
@@ -872,31 +871,18 @@ namespace ConvolutionKernelOptimized
                 }
             }
 
-            // 2. CORRECCIÓN: Movimos esto FUERA de los ciclos for (x, y)
             original.UnlockBits(dataOri);
             resultante.UnlockBits(dataRes);
             ActualizarInterfaz();
         }
 
-        private unsafe void sobelToolStripMenuItem_Click(object sender, EventArgs e)
+        private unsafe void aplicarFiltroBordes(int[,] gx, int[,] gy)
         {
             if (original == null) return;
             int width = original.Width;
             int height = original.Height;
             resultante = new Bitmap(width, height);
             int offset = 1;
-
-            int[,] gx = new int[,] {
-                { -1,  0,  1 },
-                { -2,  0,  2 },
-                { -1,  0,  1 }
-            };
-
-            int[,] gy = new int[,] {
-                { -1, -2, -1 },
-                {  0,  0,  0 },
-                {  1,  2,  1 }
-            };
 
             BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
             BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
@@ -945,6 +931,21 @@ namespace ConvolutionKernelOptimized
             ActualizarInterfaz();
         }
 
+        private unsafe void sobelToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int[,] gx = new int[,] {
+                { -1,  0,  1 },
+                { -2,  0,  2 },
+                { -1,  0,  1 }
+            };
+            int[,] gy = new int[,] {
+                { -1, -2, -1 },
+                {  0,  0,  0 },
+                {  1,  2,  1 }
+            };
+            aplicarFiltroBordes(gx, gy);
+        }
+
         private void bordesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             int[,] kernel = new int[,] {
@@ -963,6 +964,88 @@ namespace ConvolutionKernelOptimized
                 { -1, -1, -1 }
             };
             aplicarPasoAltas(kernel);
+        }
+
+        private void sobelToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            sobelToolStripMenuItem_Click(sender, e);
+        }
+
+        private void laplaceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int[,] kernel = new int[,]
+            {
+                { -1, -1, -1  },
+                { -1, 8, -1 },
+                { -1, -1, -1 },
+            };
+            aplicarPasoAltas(kernel);
+        }
+
+        private unsafe void robertsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int px1 = Math.Clamp(x + 1, 0, width - 1);
+                    int py1 = Math.Clamp(y + 1, 0, height - 1);
+
+                    byte* p00 = ptrOri + (y * dataOri.Stride) + (x * 4);
+                    byte* p10 = ptrOri + (y * dataOri.Stride) + (px1 * 4);
+                    byte* p01 = ptrOri + (py1 * dataOri.Stride) + (x * 4);
+                    byte* p11 = ptrOri + (py1 * dataOri.Stride) + (px1 * 4);
+
+                    double bx = p00[0] - p11[0];
+                    double gx_val = p00[1] - p11[1];
+                    double rx = p00[2] - p11[2];
+
+                    double by = p10[0] - p01[0];
+                    double gy_val = p10[1] - p01[1];
+                    double ry = p10[2] - p01[2];
+
+                    double b = Math.Sqrt((bx * bx) + (by * by));
+                    double g = Math.Sqrt((gx_val * gx_val) + (gy_val * gy_val));
+                    double r = Math.Sqrt((rx * rx) + (ry * ry));
+
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+                    pRes[0] = (byte)Math.Clamp(b, 0, 255);
+                    pRes[1] = (byte)Math.Clamp(g, 0, 255);
+                    pRes[2] = (byte)Math.Clamp(r, 0, 255);
+                    pRes[3] = 255;
+                }
+            }
+
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+            ActualizarInterfaz();
+        }
+
+        private void prewittToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            int[,] gx = new int[,]
+            {
+                {-1,0,1 },
+                {-1,0,1 },
+                {-1,0,1 }
+            };
+            int[,] gy = new int[,]
+            {
+                {-1,-1,-1 },
+                {0,0,0  },
+                {1,1,1 }
+            };
+            aplicarFiltroBordes(gx, gy);
         }
     }
 }
