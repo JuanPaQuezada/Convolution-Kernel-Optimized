@@ -1047,6 +1047,191 @@ namespace ConvolutionKernelOptimized
             };
             aplicarFiltroBordes(gx, gy);
         }
+
+        private void gradosToolStripMenuItem_Click(System.Object sender, EventArgs e)
+        {
+            original.RotateFlip(RotateFlipType.Rotate90FlipY);
+            pictureBox1.Image = original;
+        }
+
+        private void espejoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            original.RotateFlip(RotateFlipType.RotateNoneFlipX);
+            pictureBox1.Image = original;
+        }
+
+        private unsafe void rotarEnAnguloToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            int angulo = trackBar1.Value;
+            double radianes = angulo * Math.PI / 180.0;
+            double cos = Math.Cos(radianes);
+            double sin = Math.Sin(radianes);
+
+            int widthOri = original.Width;
+            int heightOri = original.Height;
+
+            int widthRes = (int)(Math.Abs(widthOri * cos) + Math.Abs(heightOri * sin));
+            int heightRes = (int)(Math.Abs(widthOri * sin) + Math.Abs(heightOri * cos));
+
+            Bitmap previsualizacion = new Bitmap(widthRes, heightRes);
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, widthOri, heightOri), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = previsualizacion.LockBits(new Rectangle(0, 0, widthRes, heightRes), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+
+            int cxOri = widthOri / 2;
+            int cyOri = heightOri / 2;
+            int cxRes = widthRes / 2;
+            int cyRes = heightRes / 2;
+
+            for (int y = 0; y < heightRes; y++)
+            {
+                for (int x = 0; x < widthRes; x++)
+                {
+                    int dx = x - cxRes;
+                    int dy = y - cyRes;
+
+                    int srcX = (int)(dx * cos + dy * sin) + cxOri;
+                    int srcY = (int)(-dx * sin + dy * cos) + cyOri;
+
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+
+                    if (srcX >= 0 && srcX < widthOri && srcY >= 0 && srcY < heightOri)
+                    {
+                        byte* pOri = ptrOri + (srcY * dataOri.Stride) + (srcX * 4);
+                        pRes[0] = pOri[0];
+                        pRes[1] = pOri[1];
+                        pRes[2] = pOri[2];
+                        pRes[3] = pOri[3];
+                    }
+                    else
+                    {
+                        pRes[0] = 0;
+                        pRes[1] = 0;
+                        pRes[2] = 0;
+                        pRes[3] = 0;
+                    }
+                }
+            }
+
+            original.UnlockBits(dataOri);
+            previsualizacion.UnlockBits(dataRes);
+
+            Image imagenAnterior = pictureBox1.Image;
+            pictureBox1.Image = previsualizacion;
+            pictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+
+            if (imagenAnterior != original && imagenAnterior != resultante)
+            {
+                imagenAnterior?.Dispose();
+            }
+        }
+
+        private unsafe void traslacionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            int width = original.Width;
+            int height = original.Height;
+            resultante = new Bitmap(width, height);
+
+            int tx = 50;
+            int ty = 30;
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, width, height), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    int srcX = x - tx;
+                    int srcY = y - ty;
+
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+
+                    if (srcX >= 0 && srcX < width && srcY >= 0 && srcY < height)
+                    {
+                        byte* pOri = ptrOri + (srcY * dataOri.Stride) + (srcX * 4);
+                        pRes[0] = pOri[0];
+                        pRes[1] = pOri[1];
+                        pRes[2] = pOri[2];
+                        pRes[3] = pOri[3];
+                    }
+                    else
+                    {
+                        pRes[0] = 0;
+                        pRes[1] = 0;
+                        pRes[2] = 0;
+                        pRes[3] = 0;
+                    }
+                }
+            }
+
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+            ActualizarInterfaz();
+        }
+
+        private unsafe void escalaToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (original == null) return;
+
+            float scaleX = 0.5f;
+            float scaleY = 0.5f;
+
+            int widthOri = original.Width;
+            int heightOri = original.Height;
+
+            int widthRes = (int)(widthOri * scaleX);
+            int heightRes = (int)(heightOri * scaleY);
+
+            if (widthRes <= 0 || heightRes <= 0) return;
+
+            resultante = new Bitmap(widthRes, heightRes);
+
+            BitmapData dataOri = original.LockBits(new Rectangle(0, 0, widthOri, heightOri), ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            BitmapData dataRes = resultante.LockBits(new Rectangle(0, 0, widthRes, heightRes), ImageLockMode.WriteOnly, PixelFormat.Format32bppArgb);
+
+            byte* ptrOri = (byte*)dataOri.Scan0;
+            byte* ptrRes = (byte*)dataRes.Scan0;
+
+            for (int y = 0; y < heightRes; y++)
+            {
+                for (int x = 0; x < widthRes; x++)
+                {
+                    int srcX = (int)(x / scaleX);
+                    int srcY = (int)(y / scaleY);
+
+                    srcX = Math.Clamp(srcX, 0, widthOri - 1);
+                    srcY = Math.Clamp(srcY, 0, heightOri - 1);
+
+                    byte* pOri = ptrOri + (srcY * dataOri.Stride) + (srcX * 4);
+                    byte* pRes = ptrRes + (y * dataRes.Stride) + (x * 4);
+
+                    pRes[0] = pOri[0];
+                    pRes[1] = pOri[1];
+                    pRes[2] = pOri[2];
+                    pRes[3] = pOri[3];
+                }
+            }
+
+            original.UnlockBits(dataOri);
+            resultante.UnlockBits(dataRes);
+
+            Image imagenAnterior = pictureBox1.Image;
+            pictureBox1.SizeMode = PictureBoxSizeMode.AutoSize;
+            pictureBox1.Image = resultante;
+            original = resultante;
+            imagenAnterior?.Dispose();
+        }
     }
 }
 

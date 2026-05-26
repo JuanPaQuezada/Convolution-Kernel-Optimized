@@ -69,10 +69,20 @@
             robertsToolStripMenuItem = new ToolStripMenuItem();
             prewittToolStripMenuItem = new ToolStripMenuItem();
             sobelToolStripMenuItem1 = new ToolStripMenuItem();
+            geometriaToolStripMenuItem = new ToolStripMenuItem();
+            rotacionToolStripMenuItem = new ToolStripMenuItem();
+            gradosToolStripMenuItem = new ToolStripMenuItem();
+            espejoToolStripMenuItem = new ToolStripMenuItem();
+            rotarEnAnguloToolStripMenuItem = new ToolStripMenuItem();
+            traslacionToolStripMenuItem = new ToolStripMenuItem();
+            escalaToolStripMenuItem = new ToolStripMenuItem();
+            toolStripMenuItem1 = new ToolStripMenuItem();
             openFileDialog1 = new OpenFileDialog();
             saveFileDialog1 = new SaveFileDialog();
+            trackBar1 = new TrackBar();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             menuStrip1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)trackBar1).BeginInit();
             SuspendLayout();
             // 
             // pictureBox1
@@ -86,7 +96,7 @@
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(20, 20);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { cargarImagenToolStripMenuItem, preprocesamientoToolStripMenuItem, filtrosColoresToolStripMenuItem, filtrosToolStripMenuItem, histogramaToolStripMenuItem, bordesToolStripMenuItem1 });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { cargarImagenToolStripMenuItem, preprocesamientoToolStripMenuItem, filtrosColoresToolStripMenuItem, filtrosToolStripMenuItem, histogramaToolStripMenuItem, bordesToolStripMenuItem1, geometriaToolStripMenuItem, toolStripMenuItem1 });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(800, 28);
@@ -341,40 +351,103 @@
             // laplaceToolStripMenuItem
             // 
             laplaceToolStripMenuItem.Name = "laplaceToolStripMenuItem";
-            laplaceToolStripMenuItem.Size = new Size(224, 26);
+            laplaceToolStripMenuItem.Size = new Size(143, 26);
             laplaceToolStripMenuItem.Text = "Laplace";
             laplaceToolStripMenuItem.Click += laplaceToolStripMenuItem_Click;
             // 
             // robertsToolStripMenuItem
             // 
             robertsToolStripMenuItem.Name = "robertsToolStripMenuItem";
-            robertsToolStripMenuItem.Size = new Size(224, 26);
+            robertsToolStripMenuItem.Size = new Size(143, 26);
             robertsToolStripMenuItem.Text = "Roberts";
             robertsToolStripMenuItem.Click += robertsToolStripMenuItem_Click;
             // 
             // prewittToolStripMenuItem
             // 
             prewittToolStripMenuItem.Name = "prewittToolStripMenuItem";
-            prewittToolStripMenuItem.Size = new Size(224, 26);
+            prewittToolStripMenuItem.Size = new Size(143, 26);
             prewittToolStripMenuItem.Text = "Prewitt";
             prewittToolStripMenuItem.Click += prewittToolStripMenuItem_Click;
             // 
             // sobelToolStripMenuItem1
             // 
             sobelToolStripMenuItem1.Name = "sobelToolStripMenuItem1";
-            sobelToolStripMenuItem1.Size = new Size(224, 26);
+            sobelToolStripMenuItem1.Size = new Size(143, 26);
             sobelToolStripMenuItem1.Text = "Sobel";
             sobelToolStripMenuItem1.Click += sobelToolStripMenuItem1_Click;
+            // 
+            // geometriaToolStripMenuItem
+            // 
+            geometriaToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { rotacionToolStripMenuItem, traslacionToolStripMenuItem, escalaToolStripMenuItem });
+            geometriaToolStripMenuItem.Name = "geometriaToolStripMenuItem";
+            geometriaToolStripMenuItem.Size = new Size(93, 24);
+            geometriaToolStripMenuItem.Text = "Geometria";
+            // 
+            // rotacionToolStripMenuItem
+            // 
+            rotacionToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { gradosToolStripMenuItem, espejoToolStripMenuItem, rotarEnAnguloToolStripMenuItem });
+            rotacionToolStripMenuItem.Name = "rotacionToolStripMenuItem";
+            rotacionToolStripMenuItem.Size = new Size(224, 26);
+            rotacionToolStripMenuItem.Text = "Rotacion";
+            // 
+            // gradosToolStripMenuItem
+            // 
+            gradosToolStripMenuItem.Name = "gradosToolStripMenuItem";
+            gradosToolStripMenuItem.Size = new Size(200, 26);
+            gradosToolStripMenuItem.Text = "90 Grados";
+            gradosToolStripMenuItem.Click += gradosToolStripMenuItem_Click;
+            // 
+            // espejoToolStripMenuItem
+            // 
+            espejoToolStripMenuItem.Name = "espejoToolStripMenuItem";
+            espejoToolStripMenuItem.Size = new Size(200, 26);
+            espejoToolStripMenuItem.Text = "Espejo";
+            espejoToolStripMenuItem.Click += espejoToolStripMenuItem_Click;
+            // 
+            // rotarEnAnguloToolStripMenuItem
+            // 
+            rotarEnAnguloToolStripMenuItem.Name = "rotarEnAnguloToolStripMenuItem";
+            rotarEnAnguloToolStripMenuItem.Size = new Size(200, 26);
+            rotarEnAnguloToolStripMenuItem.Text = "Rotar en Angulo";
+            rotarEnAnguloToolStripMenuItem.Click += rotarEnAnguloToolStripMenuItem_Click;
+            // 
+            // traslacionToolStripMenuItem
+            // 
+            traslacionToolStripMenuItem.Name = "traslacionToolStripMenuItem";
+            traslacionToolStripMenuItem.Size = new Size(224, 26);
+            traslacionToolStripMenuItem.Text = "Traslacion";
+            traslacionToolStripMenuItem.Click += traslacionToolStripMenuItem_Click;
+            // 
+            // escalaToolStripMenuItem
+            // 
+            escalaToolStripMenuItem.Name = "escalaToolStripMenuItem";
+            escalaToolStripMenuItem.Size = new Size(224, 26);
+            escalaToolStripMenuItem.Text = "Escala";
+            escalaToolStripMenuItem.Click += escalaToolStripMenuItem_Click;
+            // 
+            // toolStripMenuItem1
+            // 
+            toolStripMenuItem1.Name = "toolStripMenuItem1";
+            toolStripMenuItem1.Size = new Size(14, 24);
             // 
             // openFileDialog1
             // 
             openFileDialog1.FileName = "openFileDialog1";
+            // 
+            // trackBar1
+            // 
+            trackBar1.Location = new Point(623, 400);
+            trackBar1.Maximum = 360;
+            trackBar1.Name = "trackBar1";
+            trackBar1.Size = new Size(130, 56);
+            trackBar1.TabIndex = 2;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(trackBar1);
             Controls.Add(pictureBox1);
             Controls.Add(menuStrip1);
             MainMenuStrip = menuStrip1;
@@ -383,6 +456,7 @@
             ((System.ComponentModel.ISupportInitialize)pictureBox1).EndInit();
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)trackBar1).EndInit();
             ResumeLayout(false);
             PerformLayout();
         }
@@ -432,5 +506,14 @@
         private ToolStripMenuItem robertsToolStripMenuItem;
         private ToolStripMenuItem prewittToolStripMenuItem;
         private ToolStripMenuItem sobelToolStripMenuItem1;
+        private ToolStripMenuItem geometriaToolStripMenuItem;
+        private ToolStripMenuItem rotacionToolStripMenuItem;
+        private ToolStripMenuItem toolStripMenuItem1;
+        private ToolStripMenuItem gradosToolStripMenuItem;
+        private ToolStripMenuItem espejoToolStripMenuItem;
+        private ToolStripMenuItem rotarEnAnguloToolStripMenuItem;
+        private ToolStripMenuItem traslacionToolStripMenuItem;
+        private ToolStripMenuItem escalaToolStripMenuItem;
+        private TrackBar trackBar1;
     }
 }
