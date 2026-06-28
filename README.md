@@ -21,3 +21,6 @@ For the advanced spatial filtering I applied different convolution kernels to ac
 ## Non Linear Filtering and Analysis
 
 To handle non linear filtering I implemented a K Nearest Neighbors algorithm that calculates the Euclidean distance between neighboring pixels inside a spatial window. I had to write a custom QuickSort function to order these distances efficiently and average the closest values for superior noise reduction. Finally I included geometric transformations to translate, scale and rotate the image matrix using sine and cosine trigonometric mapping while ensuring the center point offset was corrected. The analysis of the data is completed through dynamic histograms that graph the intensity distribution of the pixel channels directly from the locked memory blocks.
+
+<img width="470" height="327" alt="image" src="https://github.com/user-attachments/assets/cbe55627-465a-405e-aecf-8da9556be2d8" />
+
