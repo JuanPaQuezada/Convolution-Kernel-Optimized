@@ -14,7 +14,7 @@ The color space transformations were implemented by iterating through every sing
 
 For the advanced spatial filtering I applied different convolution kernels to achieve specific visual effects without overloading the system. I programmed low pass filters such as mean filters of various matrix sizes and a Gaussian blur that generates its matrix dynamically using an exponential mathematical formula. For edge detection I implemented high pass filters like Sobel, Prewitt, Laplace and Roberts Cross by calculating the directional gradients across the horizontal and vertical axes and extracting the square root of their combined magnitudes to form the final pixel.
 
-<img width="1030" height="627" alt="image" src="https://github.com/user-attachments/assets/f2aa057f-96b6-4b5a-bce1-a9b663e217b6" />
+<img width="570" height="227" alt="image" src="https://github.com/user-attachments/assets/f2aa057f-96b6-4b5a-bce1-a9b663e217b6" />
 
 
 
