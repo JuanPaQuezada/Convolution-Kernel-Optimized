@@ -14,6 +14,9 @@ The color space transformations were implemented by iterating through every sing
 
 For the advanced spatial filtering I applied different convolution kernels to achieve specific visual effects without overloading the system. I programmed low pass filters such as mean filters of various matrix sizes and a Gaussian blur that generates its matrix dynamically using an exponential mathematical formula. For edge detection I implemented high pass filters like Sobel, Prewitt, Laplace and Roberts Cross by calculating the directional gradients across the horizontal and vertical axes and extracting the square root of their combined magnitudes to form the final pixel.
 
+![Uploading image.png…]()
+
+
 ## Non Linear Filtering and Analysis
 
 To handle non linear filtering I implemented a K Nearest Neighbors algorithm that calculates the Euclidean distance between neighboring pixels inside a spatial window. I had to write a custom QuickSort function to order these distances efficiently and average the closest values for superior noise reduction. Finally I included geometric transformations to translate, scale and rotate the image matrix using sine and cosine trigonometric mapping while ensuring the center point offset was corrected. The analysis of the data is completed through dynamic histograms that graph the intensity distribution of the pixel channels directly from the locked memory blocks.
